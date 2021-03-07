@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Grid } from 'antd'
 import { UserOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import { routes } from './configs/routes'
 
@@ -7,8 +7,11 @@ type PageLayoutProps = {
   children: React.ReactElement
 }
 
+const { useBreakpoint } = Grid
+
 function PageLayout({ children }: PageLayoutProps) {
   const location = useLocation()
+  const screens = useBreakpoint()
 
   return (
     <Layout>
@@ -17,7 +20,7 @@ function PageLayout({ children }: PageLayoutProps) {
           theme="light"
           mode="horizontal"
           selectedKeys={[location.pathname]}
-          style={{ float: 'right' }}
+          style={screens.md ? { float: 'right' } : undefined}
         >
           <Menu.Item key={routes.originalPokemons.path}>
             <Link to={routes.originalPokemons.path}>Original Pokemons</Link>
@@ -28,7 +31,7 @@ function PageLayout({ children }: PageLayoutProps) {
         </Menu>
       </Layout.Header>
       <Layout>
-        <Layout.Sider breakpoint="sm">
+        <Layout.Sider breakpoint="sm" collapsedWidth={0} trigger={null}>
           <Menu
             theme="light"
             mode="inline"
@@ -50,7 +53,9 @@ function PageLayout({ children }: PageLayoutProps) {
           </Menu>
         </Layout.Sider>
         <Layout.Content>
-          <div style={{ margin: 24, padding: 24, backgroundColor: 'white' }}>{children}</div>
+          <div style={{ margin: screens.md ? 24 : 0, padding: 24, backgroundColor: 'white' }}>
+            {children}
+          </div>
         </Layout.Content>
       </Layout>
     </Layout>
