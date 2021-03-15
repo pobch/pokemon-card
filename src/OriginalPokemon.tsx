@@ -1,5 +1,5 @@
-import { Typography } from 'antd'
-import { useQuery, useQueries } from 'react-query'
+import { Typography, Card, Row, Col } from 'antd'
+import { useQuery } from 'react-query'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 
@@ -15,13 +15,7 @@ function OriginalPokemon() {
     offset = (page - 1) * 30
   }
 
-  const {
-    status: pokemonsStatue,
-    error: pokemonsError,
-    data: pokemons,
-    isFetching: pokemonsIsFetching,
-    isPreviousData: pokemonsIsPreviousData,
-  } = useQuery(
+  const { status, error, data, isFetching, isPreviousData } = useQuery(
     ['pokemons', offset],
     async () => {
       const response = await axios.get(URL + '&offset=' + offset)
@@ -31,24 +25,68 @@ function OriginalPokemon() {
   )
 
   const pokemonUrls =
-    pokemons?.results?.map((pokemon: { name: string; url: string }) => pokemon.url) ?? []
+    data?.results?.map((pokemon: { name: string; url: string }) => pokemon.url) ?? []
 
-  const pokemonQueries = useQueries(
-    pokemonUrls.map((url: string) => {
-      return {
-        queryKey: ['pokemon', url],
-        queryFn: async () => {
-          const response = await axios.get(url)
-          return response.data
-        },
-      }
-    })
-  )
+  if (status === 'loading') {
+    return (
+      <>
+        <Title>Loading...</Title>
+      </>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <>
+        <Title>Error while fetching the list of pokemon</Title>
+      </>
+    )
+  }
 
   return (
     <>
       <Title>Original Pokemons</Title>
+      <Row gutter={[16, 16]}>
+        {pokemonUrls.map((url: string) => (
+          <PokemonCard key={url} url={url} />
+        ))}
+      </Row>
     </>
+  )
+}
+
+const { Meta } = Card
+
+function PokemonCard({ url }: { url: string }) {
+  const { status, error, data, isFetching } = useQuery(['pokemon', url], async () => {
+    const response = await axios.get(url)
+    return response.data
+  })
+
+  return (
+    <Col sm={12} span={24}>
+      <Card
+        // hoverable
+        cover={
+          <img
+            alt={data?.name}
+            src={data?.sprites?.other?.['official-artwork']?.front_default}
+            style={{ maxWidth: '100%', width: 'auto' }}
+          />
+        }
+        style={{ maxWidth: 320, margin: '0 auto' }}
+      >
+        {status === 'loading' && <Meta title="Loading..." />}
+        {status === 'error' && <Meta title="Error while fetching a pokemon detail" />}
+        <Meta
+          title={
+            <Title level={3} style={{ textTransform: 'capitalize', textAlign: 'center' }}>
+              {data?.name}
+            </Title>
+          }
+        />
+      </Card>
+    </Col>
   )
 }
 
