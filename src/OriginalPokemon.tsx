@@ -68,11 +68,13 @@ function PokemonCard({ url }: { url: string }) {
       <Card
         // hoverable
         cover={
-          <img
-            alt={data?.name}
-            src={data?.sprites?.other?.['official-artwork']?.front_default}
-            style={{ maxWidth: '100%', width: 'auto' }}
-          />
+          <div style={{ position: 'relative', height: 0, paddingTop: '100%' }}>
+            <img
+              alt={data?.name}
+              src={data?.sprites?.other?.['official-artwork']?.front_default}
+              style={{ position: 'absolute', top: 0, left: 0, maxWidth: '100%', width: 'auto' }}
+            />
+          </div>
         }
         style={{ maxWidth: 320, margin: '0 auto' }}
       >
