@@ -107,7 +107,10 @@ function PokemonCard({ url }: { url: string }) {
         {status === 'error' && <Meta title="Error while fetching a pokemon detail" />}
         <Meta
           title={
-            <Title level={3} style={{ textTransform: 'capitalize', textAlign: 'center' }}>
+            <Title
+              level={3}
+              style={{ textTransform: 'capitalize', textAlign: 'center', whiteSpace: 'normal' }}
+            >
               {data?.name}
             </Title>
           }
