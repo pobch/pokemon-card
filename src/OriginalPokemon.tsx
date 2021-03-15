@@ -1,11 +1,13 @@
-import { Typography, Card, Row, Col } from 'antd'
+import { Typography, Card, Row, Col, Pagination, Space, Grid } from 'antd'
 import { useQuery } from 'react-query'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
+import { routes } from './configs/routes'
 import axios from 'axios'
 
 const URL = 'https://pokeapi.co/api/v2/pokemon?limit=30'
 
 const { Title } = Typography
+const { useBreakpoint } = Grid
 
 function OriginalPokemon() {
   const querystring = new URLSearchParams(useLocation().search)
@@ -27,6 +29,13 @@ function OriginalPokemon() {
   const pokemonUrls =
     data?.results?.map((pokemon: { name: string; url: string }) => pokemon.url) ?? []
 
+  const history = useHistory()
+  function handlePageChange(pageNumber: number) {
+    history.push(routes.originalPokemons.path + '?page=' + pageNumber)
+  }
+
+  const screens = useBreakpoint()
+
   if (status === 'loading') {
     return (
       <>
@@ -43,14 +52,30 @@ function OriginalPokemon() {
     )
   }
 
+  const paginationComponent = (
+    <Pagination
+      simple={screens.xs}
+      showQuickJumper
+      showSizeChanger={false}
+      current={page <= 1 ? 1 : page}
+      pageSize={30}
+      total={data?.count}
+      onChange={handlePageChange}
+      style={{ textAlign: 'center' }}
+    />
+  )
   return (
     <>
       <Title>Original Pokemons</Title>
-      <Row gutter={[16, 16]}>
-        {pokemonUrls.map((url: string) => (
-          <PokemonCard key={url} url={url} />
-        ))}
-      </Row>
+      <Space direction="vertical" size="middle">
+        {paginationComponent}
+        <Row gutter={[16, 16]}>
+          {pokemonUrls.map((url: string) => (
+            <PokemonCard key={url} url={url} />
+          ))}
+        </Row>
+        {paginationComponent}
+      </Space>
     </>
   )
 }
@@ -64,7 +89,7 @@ function PokemonCard({ url }: { url: string }) {
   })
 
   return (
-    <Col sm={12} span={24}>
+    <Col sm={12} lg={8} span={24}>
       <Card
         // hoverable
         cover={
@@ -76,7 +101,7 @@ function PokemonCard({ url }: { url: string }) {
             />
           </div>
         }
-        style={{ maxWidth: 320, margin: '0 auto' }}
+        style={{ maxWidth: 240, margin: '0 auto' }}
       >
         {status === 'loading' && <Meta title="Loading..." />}
         {status === 'error' && <Meta title="Error while fetching a pokemon detail" />}

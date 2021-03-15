@@ -15,12 +15,14 @@ function PageLayout({ children }: PageLayoutProps) {
 
   return (
     <Layout>
-      <Layout.Header style={{ backgroundColor: 'white' }}>
+      <Layout.Header
+        style={{ backgroundColor: 'white', ...(screens.xs ? { padding: '0' } : undefined) }}
+      >
         <Menu
           theme="light"
           mode="horizontal"
           selectedKeys={[location.pathname]}
-          style={screens.md ? { float: 'right' } : undefined}
+          style={{ textAlign: screens.md ? 'right' : 'center' }}
         >
           <Menu.Item key={routes.originalPokemons.path}>
             <Link to={routes.originalPokemons.path}>Original Pokemons</Link>
