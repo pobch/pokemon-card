@@ -1,9 +1,14 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import App from './App'
 
-test('renders learn react link', () => {
-  render(<App />)
-  const linkElement = screen.getByText(/hello/i)
-  expect(linkElement).toBeInTheDocument()
+test('renders pokemons', async () => {
+  const { debug } = render(<App />)
+  await waitFor(
+    () => {
+      const pokemon = screen.getByText(/Nidorina/i)
+      expect(pokemon).toBeInTheDocument()
+    },
+    { timeout: 3000 }
+  )
+  debug()
 })
