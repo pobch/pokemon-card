@@ -1,3 +1,4 @@
+import firebase from 'firebase/app'
 import { Typography, Form, Input, Button, Space, Row, Col } from 'antd'
 import { db } from './firebase/init'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
@@ -7,27 +8,35 @@ const { Title } = Typography
 
 function CustomPokemon() {
   const queryClient = useQueryClient()
+  const [form] = Form.useForm()
 
   const mutationAddPokemon = useMutation(
     async (newPokemon: Record<string, any>) => {
-      const docRef = await db.collection('pokemons').add({ name: newPokemon.name })
+      const docRef = await db
+        .collection('pokemons')
+        .add({ name: newPokemon.name, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
       return docRef
     },
     {
       onSuccess: (data, variables, context) => {
         queryClient.invalidateQueries('customPokemons')
+        form.resetFields()
       },
     }
   )
 
   const { status, error, data, isFetching } = useQuery(
     'customPokemons',
-    async (): Promise<{ name: string; id: string }[]> => {
-      const querySnapshot = await db.collection('pokemons').get()
-      let customPokemons: { name: string; id: string }[] = []
+    async (): Promise<{ name: string; id: string; createdAt: firebase.firestore.Timestamp }[]> => {
+      const querySnapshot = await db.collection('pokemons').orderBy('createdAt', 'desc').get()
+      let customPokemons: {
+        name: string
+        id: string
+        createdAt: firebase.firestore.Timestamp
+      }[] = []
       querySnapshot.forEach((doc) => {
         const customPokemon = {
-          ...(doc.data() as { name: string }),
+          ...(doc.data() as { name: string; createdAt: firebase.firestore.Timestamp }),
           id: doc.id,
         }
         customPokemons.push(customPokemon)
@@ -52,7 +61,7 @@ function CustomPokemon() {
       <Title>Custom Pokemon</Title>
 
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <Form onFinish={mutationAddPokemon.mutate}>
+        <Form onFinish={mutationAddPokemon.mutate} form={form}>
           <Title level={4}>Add your new Pokemon!</Title>
           <Form.Item
             name="name"
