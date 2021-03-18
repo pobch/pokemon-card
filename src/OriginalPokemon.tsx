@@ -1,4 +1,4 @@
-import { Typography, Card, Row, Pagination, Space, Grid } from 'antd'
+import { Typography, Card, Row, Col, Pagination, Space, Grid } from 'antd'
 import { useQuery } from 'react-query'
 import { useLocation, useHistory } from 'react-router-dom'
 import { routes } from './configs/routes'
@@ -57,12 +57,16 @@ function PokemonList() {
 
   return (
     <>
-      <Space direction="vertical" size="middle">
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <PokemonPagination totalCount={totalPokemon} />
         <Row gutter={[16, 16]}>
-          {pokemonUrls.map((url: string) => (
-            <PokemonData key={url} url={url} />
-          ))}
+          {pokemonUrls.map((url: string) => {
+            return (
+              <Col key={url} sm={12} lg={8} span={24}>
+                <PokemonData url={url} />
+              </Col>
+            )
+          })}
         </Row>
         <PokemonPagination totalCount={totalPokemon} />
       </Space>

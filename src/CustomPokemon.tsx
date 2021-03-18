@@ -1,18 +1,48 @@
-import { Typography, Form, Input, Button } from 'antd'
+import { Typography, Form, Input, Button, Space, Row, Col } from 'antd'
 import { db } from './firebase/init'
-import { useMutation } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
+import { PokemonCard } from './PokemonCard'
 
 const { Title } = Typography
 
 function CustomPokemon() {
-  const mutation = useMutation(
+  const queryClient = useQueryClient()
+
+  const mutationAddPokemon = useMutation(
     async (newPokemon: Record<string, any>) => {
       const docRef = await db.collection('pokemons').add({ name: newPokemon.name })
       return docRef
     },
     {
       onSuccess: (data, variables, context) => {
-        console.log(data.id)
+        queryClient.invalidateQueries('customPokemons')
+      },
+    }
+  )
+
+  const { status, error, data, isFetching } = useQuery(
+    'customPokemons',
+    async (): Promise<{ name: string; id: string }[]> => {
+      const querySnapshot = await db.collection('pokemons').get()
+      let customPokemons: { name: string; id: string }[] = []
+      querySnapshot.forEach((doc) => {
+        const customPokemon = {
+          ...(doc.data() as { name: string }),
+          id: doc.id,
+        }
+        customPokemons.push(customPokemon)
+      })
+      return customPokemons
+    }
+  )
+
+  const mutationRemovePokemon = useMutation(
+    async (id: string) => {
+      return db.collection('pokemons').doc(id).delete()
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('customPokemons')
       },
     }
   )
@@ -20,22 +50,43 @@ function CustomPokemon() {
   return (
     <>
       <Title>Custom Pokemon</Title>
-      <Form onFinish={mutation.mutate}>
-        <Title level={4}>Add your new Pokemon!</Title>
-        <Form.Item
-          name="name"
-          label="Pokemon Name"
-          rules={[{ required: true, message: 'Pokemon name is required' }]}
-        >
-          <Input disabled={mutation.isLoading} />
-        </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={mutation.isLoading}>
-            Add
-          </Button>
-        </Form.Item>
-      </Form>
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Form onFinish={mutationAddPokemon.mutate}>
+          <Title level={4}>Add your new Pokemon!</Title>
+          <Form.Item
+            name="name"
+            label="Pokemon Name"
+            rules={[{ required: true, message: 'Pokemon name is required' }]}
+          >
+            <Input disabled={mutationAddPokemon.isLoading} style={{ maxWidth: 560 }} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" disabled={mutationAddPokemon.isLoading}>
+              Add
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <Row gutter={[16, 16]}>
+          {data?.map((customPokemon) => {
+            return (
+              <Col key={customPokemon.id} sm={12} lg={8} span={24}>
+                <PokemonCard status={status} pokemonName={customPokemon.name} pokemonImgSrc="" />
+                <div style={{ textAlign: 'center' }}>
+                  <Button
+                    onClick={() => mutationRemovePokemon.mutate(customPokemon.id)}
+                    loading={mutationRemovePokemon.isLoading}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </Col>
+            )
+          })}
+        </Row>
+      </Space>
     </>
   )
 }
