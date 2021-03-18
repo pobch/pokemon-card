@@ -1,10 +1,10 @@
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { routes } from './configs/routes'
-import OriginalPokemon from './OriginalPokemon'
-import NotFoundPage from './NotFoundPage'
-import PageLayout from './PageLayout'
-import CustomPokemon from './CustomPokemon'
+import { OriginalPokemon } from './OriginalPokemon'
+import { NotFoundPage } from './NotFoundPage'
+import { PageLayout } from './PageLayout'
+import { CustomPokemon } from './CustomPokemon'
 
 const queryClient = new QueryClient()
 
@@ -30,4 +30,4 @@ function App() {
   )
 }
 
-export default App
+export { App }

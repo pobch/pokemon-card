@@ -10,4 +10,4 @@ function NotFoundPage() {
   )
 }
 
-export default NotFoundPage
+export { NotFoundPage }

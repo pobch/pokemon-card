@@ -1,21 +1,37 @@
-import { Typography, Card, Row, Col, Pagination, Space, Grid } from 'antd'
+import { Typography, Card, Row, Pagination, Space, Grid } from 'antd'
 import { useQuery } from 'react-query'
 import { useLocation, useHistory } from 'react-router-dom'
 import { routes } from './configs/routes'
 import axios from 'axios'
+import { PokemonCard } from './PokemonCard'
+
+const { Title } = Typography
+
+function OriginalPokemon() {
+  return (
+    <>
+      <Title>Original Pokemons</Title>
+      <PokemonList />
+    </>
+  )
+}
 
 const URL = 'https://pokeapi.co/api/v2/pokemon?limit=30'
 
-const { Title } = Typography
 const { useBreakpoint } = Grid
 
-function OriginalPokemon() {
+function useGetPageFromURL() {
   const querystring = new URLSearchParams(useLocation().search)
-  const page = Number(querystring.get('page'))
-  let offset = 0
-  if (page && page >= 1) {
-    offset = (page - 1) * 30
+  let page = Number(querystring.get('page'))
+  if (!page || page <= 0) {
+    page = 1
   }
+  return page
+}
+
+function PokemonList() {
+  const page = useGetPageFromURL()
+  const offset = (page - 1) * 30
 
   const { status, error, data, isFetching, isPreviousData } = useQuery(
     ['pokemons', offset],
@@ -29,6 +45,34 @@ function OriginalPokemon() {
   const pokemonUrls =
     data?.results?.map((pokemon: { name: string; url: string }) => pokemon.url) ?? []
 
+  const totalPokemon = data?.count ?? 0
+
+  if (status === 'loading') {
+    return <>Loading...</>
+  }
+
+  if (status === 'error') {
+    return <>Error while fetching the list of pokemon</>
+  }
+
+  return (
+    <>
+      <Space direction="vertical" size="middle">
+        <PokemonPagination totalCount={totalPokemon} />
+        <Row gutter={[16, 16]}>
+          {pokemonUrls.map((url: string) => (
+            <PokemonData key={url} url={url} />
+          ))}
+        </Row>
+        <PokemonPagination totalCount={totalPokemon} />
+      </Space>
+    </>
+  )
+}
+
+function PokemonPagination({ totalCount }: { totalCount: number }) {
+  const page = useGetPageFromURL()
+
   const history = useHistory()
   function handlePageChange(pageNumber: number) {
     history.push(routes.originalPokemons.path + '?page=' + pageNumber)
@@ -36,88 +80,35 @@ function OriginalPokemon() {
 
   const screens = useBreakpoint()
 
-  if (status === 'loading') {
-    return (
-      <>
-        <Title>Loading...</Title>
-      </>
-    )
-  }
-
-  if (status === 'error') {
-    return (
-      <>
-        <Title>Error while fetching the list of pokemon</Title>
-      </>
-    )
-  }
-
-  const paginationComponent = (
+  return (
     <Pagination
       simple={screens.xs}
       showQuickJumper
       showSizeChanger={false}
-      current={page <= 1 ? 1 : page}
+      current={page}
       pageSize={30}
-      total={data?.count}
+      total={totalCount}
       onChange={handlePageChange}
       style={{ textAlign: 'center' }}
     />
-  )
-  return (
-    <>
-      <Title>Original Pokemons</Title>
-      <Space direction="vertical" size="middle">
-        {paginationComponent}
-        <Row gutter={[16, 16]}>
-          {pokemonUrls.map((url: string) => (
-            <PokemonCard key={url} url={url} />
-          ))}
-        </Row>
-        {paginationComponent}
-      </Space>
-    </>
   )
 }
 
 const { Meta } = Card
 
-function PokemonCard({ url }: { url: string }) {
+function PokemonData({ url }: { url: string }) {
   const { status, error, data, isFetching } = useQuery(['pokemon', url], async () => {
     const response = await axios.get(url)
     return response.data
   })
 
   return (
-    <Col sm={12} lg={8} span={24}>
-      <Card
-        // hoverable
-        cover={
-          <div style={{ position: 'relative', height: 0, paddingTop: '100%' }}>
-            <img
-              alt={data?.name}
-              src={data?.sprites?.other?.['official-artwork']?.front_default}
-              style={{ position: 'absolute', top: 0, left: 0, maxWidth: '100%', width: 'auto' }}
-            />
-          </div>
-        }
-        style={{ maxWidth: 240, margin: '0 auto' }}
-      >
-        {status === 'loading' && <Meta title="Loading..." />}
-        {status === 'error' && <Meta title="Error while fetching a pokemon detail" />}
-        <Meta
-          title={
-            <Title
-              level={3}
-              style={{ textTransform: 'capitalize', textAlign: 'center', whiteSpace: 'normal' }}
-            >
-              {data?.name}
-            </Title>
-          }
-        />
-      </Card>
-    </Col>
+    <PokemonCard
+      status={status}
+      pokemonName={data?.name}
+      pokemonImgSrc={data?.sprites?.other?.['official-artwork']?.front_default}
+    />
   )
 }
 
-export default OriginalPokemon
+export { OriginalPokemon }

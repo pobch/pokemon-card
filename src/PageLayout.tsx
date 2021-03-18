@@ -64,4 +64,4 @@ function PageLayout({ children }: PageLayoutProps) {
   )
 }
 
-export default PageLayout
+export { PageLayout }
