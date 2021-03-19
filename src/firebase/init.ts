@@ -5,6 +5,7 @@ import 'firebase/analytics'
 // Add the Firebase products that you want to use
 import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/storage'
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -21,5 +22,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 const db = firebase.firestore()
+const storage = firebase.storage()
 
-export { db }
+export { db, storage }
