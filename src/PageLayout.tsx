@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Layout, Menu, Grid } from 'antd'
 import { UserOutlined, VideoCameraOutlined } from '@ant-design/icons'
-import { routes } from './configs/routes'
+import { routes, RouteKey } from './configs/routes'
 
 type PageLayoutProps = {
   children: React.ReactElement
@@ -24,11 +24,14 @@ function PageLayout({ children }: PageLayoutProps) {
           selectedKeys={[location.pathname]}
           style={{ textAlign: screens.md ? 'right' : 'center' }}
         >
-          <Menu.Item key={routes.originalPokemons.path}>
-            <Link to={routes.originalPokemons.path}>Original Pokemons</Link>
+          <Menu.Item key={routes[RouteKey.OriginalPokemons].path}>
+            <Link to={routes[RouteKey.OriginalPokemons].path}>Original Pokemons</Link>
           </Menu.Item>
-          <Menu.Item key={routes.customPokemons.path}>
-            <Link to={routes.customPokemons.path}>Custom Pokemons</Link>
+          <Menu.Item key={routes[RouteKey.CustomPokemons].path}>
+            <Link to={routes[RouteKey.CustomPokemons].path}>Custom Pokemons</Link>
+          </Menu.Item>
+          <Menu.Item key={routes[RouteKey.SignIn].path}>
+            <Link to={routes[RouteKey.SignIn].path}>Sign In</Link>
           </Menu.Item>
         </Menu>
       </Layout.Header>
@@ -46,11 +49,11 @@ function PageLayout({ children }: PageLayoutProps) {
               height: '100vh',
             }}
           >
-            <Menu.Item key={routes.originalPokemons.path} icon={<UserOutlined />}>
-              <Link to={routes.originalPokemons.path}>Original Pokemons</Link>
+            <Menu.Item key={routes[RouteKey.OriginalPokemons].path} icon={<UserOutlined />}>
+              <Link to={routes[RouteKey.OriginalPokemons].path}>Original Pokemons</Link>
             </Menu.Item>
-            <Menu.Item key={routes.customPokemons.path} icon={<VideoCameraOutlined />}>
-              <Link to={routes.customPokemons.path}>Custom Pokemons</Link>
+            <Menu.Item key={routes[RouteKey.CustomPokemons].path} icon={<VideoCameraOutlined />}>
+              <Link to={routes[RouteKey.CustomPokemons].path}>Custom Pokemons</Link>
             </Menu.Item>
           </Menu>
         </Layout.Sider>

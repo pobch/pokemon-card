@@ -1,7 +1,7 @@
 import { Typography, Card, Row, Col, Pagination, Space, Grid } from 'antd'
 import { useQuery } from 'react-query'
 import { useLocation, useHistory } from 'react-router-dom'
-import { routes } from './configs/routes'
+import { RouteKey, routes } from './configs/routes'
 import axios from 'axios'
 import { PokemonCard } from './PokemonCard'
 
@@ -79,7 +79,7 @@ function PokemonPagination({ totalCount }: { totalCount: number }) {
 
   const history = useHistory()
   function handlePageChange(pageNumber: number) {
-    history.push(routes.originalPokemons.path + '?page=' + pageNumber)
+    history.push(routes[RouteKey.OriginalPokemons].path + '?page=' + pageNumber)
   }
 
   const screens = useBreakpoint()

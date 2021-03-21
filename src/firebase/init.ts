@@ -6,6 +6,8 @@ import 'firebase/analytics'
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
+import * as firebaseui from 'firebaseui'
+import 'firebaseui/dist/firebaseui.css'
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -23,5 +25,6 @@ firebase.initializeApp(firebaseConfig)
 
 const db = firebase.firestore()
 const storage = firebase.storage()
+const ui = new firebaseui.auth.AuthUI(firebase.auth())
 
-export { db, storage }
+export { db, storage, ui }

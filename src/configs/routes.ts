@@ -1,10 +1,19 @@
-const routes = {
-  originalPokemons: {
+enum RouteKey {
+  OriginalPokemons,
+  CustomPokemons,
+  SignIn,
+}
+
+const routes: Record<RouteKey, { path: string }> = {
+  [RouteKey.OriginalPokemons]: {
     path: '/',
   },
-  customPokemons: {
+  [RouteKey.CustomPokemons]: {
     path: '/custom',
+  },
+  [RouteKey.SignIn]: {
+    path: '/signin',
   },
 }
 
-export { routes }
+export { routes, RouteKey }
