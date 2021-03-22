@@ -6,7 +6,7 @@ import { routes, RouteKey } from './configs/routes'
 import { useAccountConsumer } from './AccountContext'
 
 type PageLayoutProps = {
-  children: React.ReactElement
+  children: React.ReactNode
 }
 
 const { useBreakpoint } = Grid

@@ -31,19 +31,26 @@ function Routers() {
     // Unauthed routes
     return (
       <BrowserRouter>
-        <PageLayout>
-          <Switch>
-            <Route exact path={routes[RouteKey.OriginalPokemons].path}>
-              <OriginalPokemon />
-            </Route>
-            <Route exact path={routes[RouteKey.SignIn].path}>
-              <SignIn />
-            </Route>
-            <Route>
-              <NotFoundPage />
-            </Route>
-          </Switch>
-        </PageLayout>
+        <Switch>
+          <Route
+            exact
+            path={[routes[RouteKey.OriginalPokemons].path, routes[RouteKey.SignIn].path]}
+          >
+            <PageLayout>
+              <Switch>
+                <Route exact path={routes[RouteKey.OriginalPokemons].path}>
+                  <OriginalPokemon />
+                </Route>
+                <Route exact path={routes[RouteKey.SignIn].path}>
+                  <SignIn />
+                </Route>
+              </Switch>
+            </PageLayout>
+          </Route>
+          <Route>
+            <NotFoundPage />
+          </Route>
+        </Switch>
       </BrowserRouter>
     )
   }
@@ -51,19 +58,26 @@ function Routers() {
   // Authed routes
   return (
     <BrowserRouter>
-      <PageLayout>
-        <Switch>
-          <Route exact path={routes[RouteKey.OriginalPokemons].path}>
-            <OriginalPokemon />
-          </Route>
-          <Route exact path={routes[RouteKey.CustomPokemons].path}>
-            <CustomPokemon />
-          </Route>
-          <Route>
-            <NotFoundPage />
-          </Route>
-        </Switch>
-      </PageLayout>
+      <Switch>
+        <Route
+          exact
+          path={[routes[RouteKey.OriginalPokemons].path, routes[RouteKey.CustomPokemons].path]}
+        >
+          <PageLayout>
+            <Switch>
+              <Route exact path={routes[RouteKey.OriginalPokemons].path}>
+                <OriginalPokemon />
+              </Route>
+              <Route exact path={routes[RouteKey.CustomPokemons].path}>
+                <CustomPokemon />
+              </Route>
+            </Switch>
+          </PageLayout>
+        </Route>
+        <Route>
+          <NotFoundPage />
+        </Route>
+      </Switch>
     </BrowserRouter>
   )
 }

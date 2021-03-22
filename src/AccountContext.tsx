@@ -13,12 +13,12 @@ const accountContext = createContext<{
   isLoadingAuth: boolean
 } | null>(null)
 
-function AccountProvider({ children }: { children: React.ReactElement }) {
+function AccountProvider({ children }: { children: React.ReactNode }) {
   const [account, setAccount] = useState<AccountType | null>(null)
   const [isLoadingAuth, setIsLoadingAuth] = useState(true)
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(
+    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
       (user) => {
         if (user) {
           // User is signed in.
@@ -43,10 +43,11 @@ function AccountProvider({ children }: { children: React.ReactElement }) {
           setIsLoadingAuth(false)
         }
       },
-      function (error) {
+      (error) => {
         console.log(error)
       }
     )
+    return () => unregisterAuthObserver()
   }, [])
 
   return (
